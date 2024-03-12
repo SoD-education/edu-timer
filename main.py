@@ -8,9 +8,11 @@ class CountdownApp:
         self.master = master
         self.setup_master()
         self.initialize_variables()
-        self.setup_layout()
-        self.create_widgets()
+        self.setup_styles()  # Set up the styles for themes
+        self.setup_layout()  # Set up the layout before applying themes
+        self.create_widgets()  # Create widgets before applying themes
         self.bind_events()
+        self.initialize_themes()
 
     def setup_master(self):
         self.master.title("Countdown Timer")
@@ -24,10 +26,45 @@ class CountdownApp:
         self.paused = False
         self.initial_timer = "00:00:00"
 
+    def setup_styles(self):
+        self.style = ttk.Style()
+        # Define styles for dark theme
+        self.style.configure("Dark.TFrame", background="#0f161c")
+        self.style.configure("Dark.TLabel", background="#0f161c", foreground="#FFFFFF")
+        self.style.configure("Dark.TButton", background="#0f161c", foreground="#FFFFFF")
+        # Define styles for light theme
+        self.style.configure("Light.TFrame", background="#FFFFFF")
+        self.style.configure("Light.TLabel", background="#FFFFFF", foreground="#000000")
+        self.style.configure(
+            "Light.TButton", background="#FFFFFF", foreground="#000000"
+        )
+
+    def initialize_themes(self):
+        self.current_theme = "Dark"
+        self.apply_theme()
+
+    def toggle_theme(self):
+        self.current_theme = "Light" if self.current_theme == "Dark" else "Dark"
+        self.apply_theme()
+
+    def apply_theme(self):
+        theme_prefix = self.current_theme
+        self.timer_inner_frame.config(style=f"{theme_prefix}.TFrame")
+        self.timer_buttons_frame.config(style=f"{theme_prefix}.TFrame")
+        self.timer_display.config(style=f"{theme_prefix}.TLabel")
+        # Update any other widgets as needed
+        for child in self.master.winfo_children():
+            widget_type = child.winfo_class()
+            if widget_type in ["TFrame", "TLabel", "TButton"]:
+                child.config(style=f"{theme_prefix}.{widget_type}")
+
     def setup_layout(self):
         self.entry_frame = ttk.Labelframe(self.master, text="Set Timer")
-        self.entry_frame.grid(row=0, column=0, sticky="nw", padx=10)
+        self.entry_frame.grid(row=0, column=0, sticky="nw", padx=(20, 0), pady=(10, 0))
         self.master.columnconfigure(0, weight=1)
+
+        self.entry_input_frame = ttk.Frame(self.entry_frame)
+        self.entry_input_frame.grid(row=0, column=0, sticky="nw", padx=(10, 0))
 
         self.timer_display_frame = ttk.Frame(self.master)
         self.timer_display_frame.grid(row=2, column=0, sticky="nsew", pady=(20, 0))
@@ -43,13 +80,33 @@ class CountdownApp:
         ]
         for index, (unit, var) in enumerate(time_units, start=1):
             ttk.Entry(
-                self.entry_frame, textvariable=var, width=5, justify="center"
+                self.entry_input_frame, textvariable=var, width=5, justify="center"
             ).grid(row=0, column=index * 2 - 1, padx=5, pady=10)
             if unit != "seconds":
-                ttk.Label(self.entry_frame, text=":").grid(row=0, column=index * 2)
+                ttk.Label(self.entry_input_frame, text=":").grid(
+                    row=0, column=index * 2
+                )
 
         self.create_control_buttons()
         self.setup_timer_display()
+
+        # ^ START Dark/Light theme toggle
+        # Frame for the widgets
+        self.theme_toggle_frame = ttk.Frame(self.entry_input_frame)
+        self.theme_toggle_frame.grid(row=0, column=9, padx=10, pady=10)
+
+        self.theme_toggle_label = ttk.Label(self.theme_toggle_frame, text="Dark")
+        self.theme_toggle_label.grid(row=0, column=9, padx=5, pady=10)
+        self.theme_toggle_button = ttk.Checkbutton(
+            self.theme_toggle_frame,
+            # text="Light",
+            command=self.toggle_theme,
+            bootstyle="dark-square-toggle",
+        )
+        self.theme_toggle_button.grid(row=0, column=10, padx=5, pady=10)
+        self.theme_toggle_label = ttk.Label(self.theme_toggle_frame, text="Light")
+        self.theme_toggle_label.grid(row=0, column=11, padx=2, pady=10)
+        # ^ END Dark/Light theme toggle
 
     def create_control_buttons(self):
         buttons = [
@@ -58,7 +115,7 @@ class CountdownApp:
         ]
         for index, (text, command, style) in enumerate(buttons, start=7):
             ttk.Button(
-                self.entry_frame, text=text, command=command, bootstyle=style
+                self.entry_input_frame, text=text, command=command, bootstyle=style
             ).grid(row=0, column=index, padx=5)
 
     def setup_timer_display(self):
