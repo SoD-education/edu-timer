@@ -1,31 +1,10 @@
 import tkinter as tk
 from tkinter import ttk
 import ttkbootstrap as ttkb
-from ttkbootstrap.dialogs import Messagebox
-
-from ttkbootstrap.constants import PRIMARY, DANGER, SUCCESS, WARNING
-import json
-import os
 
 
-def load_app_config(default_theme="cerculean"):
-    config_path = "app_config.json"
-    if os.path.exists(config_path):
-        with open(config_path, "r") as file:
-            try:
-                config = json.load(file)
-                return config.get("theme", default_theme), config.get(
-                    "rememberTheme", False
-                )
-            except json.JSONDecodeError:
-                pass
-    return default_theme, False
-
-
-def save_app_config(theme, remember_theme=True):
-    config_path = "app_config.json"
-    with open(config_path, "w") as file:
-        json.dump({"theme": theme, "rememberTheme": remember_theme}, file, indent=4)
+def load_app_config():
+    return "superhero", False
 
 
 class CountdownApp:
@@ -48,7 +27,6 @@ class CountdownApp:
         self.running = False
         self.paused = False
         self.initial_timer = "00:00:00"
-        self.selected_theme, self.remember_theme = load_app_config()
 
     def setup_layout(self):
         self.entry_frame = ttk.Labelframe(self.master, text="Set Timer")
@@ -76,51 +54,16 @@ class CountdownApp:
 
         self.create_control_buttons()
         self.setup_timer_display()
-        self.create_theme_change_button()
-
-    def create_timer_entries(self):
-        time_units = [
-            ("hours", self.hours),
-            ("minutes", self.minutes),
-            ("seconds", self.seconds),
-        ]
-        for index, (unit, var) in enumerate(time_units, start=1):
-            ttk.Entry(
-                self.entry_frame, textvariable=var, width=5, justify="center"
-            ).grid(row=0, column=index * 2 - 1, padx=5, pady=10)
-            if unit != "seconds":
-                ttk.Label(self.entry_frame, text=":").grid(row=0, column=index * 2)
 
     def create_control_buttons(self):
         buttons = [
-            ("SET", self.set_timer, PRIMARY),
-            ("CLEAR", self.clear_timer, DANGER),
+            ("SET", self.set_timer, "primary"),
+            ("CLEAR", self.clear_timer, "danger"),
         ]
         for index, (text, command, style) in enumerate(buttons, start=7):
             ttk.Button(
                 self.entry_frame, text=text, command=command, bootstyle=style
             ).grid(row=0, column=index, padx=5)
-
-    def create_theme_change_button(self):
-        # Place the button in a labelframe to keep it in the top-right corner
-        self.theme_frame = ttk.Labelframe(self.master, text="Change Theme")
-        self.theme_frame.place(relx=0.99, y=0, anchor="ne")
-
-        self.theme_var = tk.StringVar(value=self.selected_theme)
-        self.theme_button = ttk.OptionMenu(
-            self.theme_frame,
-            self.theme_var,
-            self.selected_theme,
-            *ttkb.Style().theme_names(),
-            command=self.change_theme,
-        )
-        # self.theme_button.place(relx=1.0, y=0, anchor="ne")
-        self.theme_button.pack(padx=5, pady=10)
-
-    def change_theme(self, theme):
-        save_app_config(theme, self.remember_theme)
-        # Inform the user to restart the application to apply the theme change
-        Messagebox.ok("Theme Changed. Please restart the app to apply the new theme.")
 
     def setup_timer_display(self):
         self.timer_inner_frame = ttk.Frame(self.timer_display_frame)
@@ -141,7 +84,7 @@ class CountdownApp:
             self.timer_buttons_frame,
             text="START",
             command=self.start_timer,
-            bootstyle=SUCCESS,
+            bootstyle="success",
             state="disabled",
         )
         self.start_button.pack(side=tk.LEFT, padx=(0, 10))
@@ -150,7 +93,7 @@ class CountdownApp:
             self.timer_buttons_frame,
             text="PAUSE",
             command=self.pause_timer,
-            bootstyle=WARNING,
+            bootstyle="warning",
             state="disabled",
         )
         self.pause_button.pack(side=tk.LEFT)
@@ -267,8 +210,7 @@ class CountdownApp:
 
 
 def main():
-    selected_theme, _ = load_app_config()
-    root = ttkb.Window(themename=selected_theme)
+    root = ttkb.Window(themename="superhero")
     CountdownApp(root)
     root.mainloop()
 
