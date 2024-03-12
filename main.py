@@ -1,3 +1,9 @@
+"""
+This application creates a countdown timer using Tkinter and ttkbootstrap.
+Features include setting the timer, starting, pausing, and resetting the timer.
+The application also has a dark and light theme toggle.
+"""
+
 import tkinter as tk
 from tkinter import ttk
 import ttkbootstrap as ttkb
