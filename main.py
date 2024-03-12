@@ -2,6 +2,9 @@ import tkinter as tk
 from tkinter import ttk
 import ttkbootstrap as ttkb
 
+import os
+import sys
+
 
 class CountdownApp:
     def __init__(self, master):
@@ -18,6 +21,19 @@ class CountdownApp:
         self.master.title("Countdown Timer")
         self.master.geometry("1000x600")
         self.master.minsize(600, 300)
+
+        # * Added the rest to handle the icon
+        # ^ To export the app: pyinstaller --onefile --windowed --icon=assets/clock.ico --add-data "assets;assets" main.py
+        # Determine if running as a bundled application or in a development environment
+        if getattr(sys, "frozen", False):
+            # If bundled, use the _MEIPASS directory
+            application_path = sys._MEIPASS
+        else:
+            # If running in a dev environment, use the current directory
+            application_path = os.path.dirname(os.path.abspath(__file__))
+
+        icon_path = os.path.join(application_path, "assets", "clock.ico")
+        self.master.iconbitmap(icon_path)
 
     def initialize_variables(self):
         self.hours, self.minutes, self.seconds = (tk.StringVar() for _ in range(3))
