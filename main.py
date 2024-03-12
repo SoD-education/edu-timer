@@ -8,6 +8,7 @@ import sys
 
 class CountdownApp:
     def __init__(self, master):
+        """This class will create a countdown timer application."""
         self.master = master
         self.setup_master()
         self.initialize_variables()
@@ -18,6 +19,7 @@ class CountdownApp:
         self.initialize_themes()
 
     def setup_master(self):
+        """Set up the master window with title, size, and icon."""
         self.master.title("Countdown Timer")
         self.master.geometry("1000x600")
         self.master.minsize(600, 300)
@@ -36,6 +38,7 @@ class CountdownApp:
         self.master.iconbitmap(icon_path)
 
     def initialize_variables(self):
+        """Initialize the variables for the application."""
         self.hours, self.minutes, self.seconds = (tk.StringVar() for _ in range(3))
         self.timer = "00:00:00"
         self.running = False
@@ -43,6 +46,7 @@ class CountdownApp:
         self.initial_timer = "00:00:00"
 
     def setup_styles(self):
+        """Set up the styles for the application."""
         self.style = ttk.Style()
         # Define styles for dark theme
         self.style.configure("Dark.TFrame", background="#0f161c")
@@ -56,14 +60,17 @@ class CountdownApp:
         )
 
     def initialize_themes(self):
+        """This method will initialize the themes for the application."""
         self.current_theme = "Dark"
         self.apply_theme()
 
     def toggle_theme(self):
+        """This method will toggle the theme between Dark and Light."""
         self.current_theme = "Light" if self.current_theme == "Dark" else "Dark"
         self.apply_theme()
 
     def apply_theme(self):
+        """Apply the current theme to the application."""
         theme_prefix = self.current_theme
         self.timer_inner_frame.config(style=f"{theme_prefix}.TFrame")
         self.timer_buttons_frame.config(style=f"{theme_prefix}.TFrame")
@@ -75,6 +82,7 @@ class CountdownApp:
                 child.config(style=f"{theme_prefix}.{widget_type}")
 
     def setup_layout(self):
+        """Set up the layout for the application."""
         self.entry_frame = ttk.Labelframe(self.master, text="Set Timer")
         self.entry_frame.grid(row=0, column=0, sticky="nw", padx=(20, 0), pady=(10, 0))
         self.master.columnconfigure(0, weight=1)
@@ -89,6 +97,7 @@ class CountdownApp:
         self.timer_display_frame.rowconfigure(0, weight=1)
 
     def create_widgets(self):
+        """Widgets for the application."""
         time_units = [
             ("hours", self.hours),
             ("minutes", self.minutes),
@@ -125,6 +134,7 @@ class CountdownApp:
         # ^ END Dark/Light theme toggle
 
     def create_control_buttons(self):
+        """Buttons for the application."""
         buttons = [
             ("SET", self.set_timer, "primary"),
             ("CLEAR", self.clear_timer, "danger"),
@@ -135,6 +145,7 @@ class CountdownApp:
             ).grid(row=0, column=index, padx=5)
 
     def setup_timer_display(self):
+        """Set up the timer display for the application."""
         self.timer_inner_frame = ttk.Frame(self.timer_display_frame)
         self.timer_inner_frame.place(relx=0.5, rely=0.5, anchor="center")
 
@@ -168,9 +179,11 @@ class CountdownApp:
         self.pause_button.pack(side=tk.LEFT)
 
     def bind_events(self):
+        """Bind events to the application."""
         self.master.bind("<Configure>", self.on_resize)
 
     def set_timer(self):
+        """Set the timer to the values entered in the input fields."""
         # Get the values from the input, ensuring they don't exceed max allowed values
         hours = min(int(self.hours.get() if self.hours.get() else 0), 23)
         minutes = min(int(self.minutes.get() if self.minutes.get() else 0), 59)
@@ -188,6 +201,7 @@ class CountdownApp:
         self.evaluate_start_button_state()
 
     def clear_timer(self):
+        """Clear the timer and reset the application to its initial state."""
         self.hours.set("")
         self.minutes.set("")
         self.seconds.set("")
@@ -200,6 +214,7 @@ class CountdownApp:
         self.evaluate_start_button_state()
 
     def reset_timer(self):
+        """Reset the timer to its initial state."""
         self.running = False
         self.paused = False
         self.timer = self.initial_timer
@@ -209,6 +224,7 @@ class CountdownApp:
         self.evaluate_start_button_state()
 
     def start_timer(self):
+        """Start the timer or reset it if it's already running."""
         if self.start_button.cget("text") == "RESET" or self.timer == "Time's up!":
             self.reset_timer()
         elif not self.running and (
@@ -223,6 +239,7 @@ class CountdownApp:
             self.reset_timer()
 
     def pause_timer(self):
+        """Pause or resume the timer."""
         if not self.paused:
             self.paused = True
             self.pause_button.config(text="RESUME")
@@ -233,6 +250,7 @@ class CountdownApp:
                 self.countdown()
 
     def countdown(self):
+        """This method will handle the countdown of the timer."""
         if self.running and not self.paused:
             h, m, s = map(int, self.timer.split(":"))
             if s > 0 or m > 0 or h > 0:
@@ -255,18 +273,22 @@ class CountdownApp:
             self.master.after(1000, self.countdown)
 
     def update_display(self):
+        """Update the timer display with the current timer value."""
         self.timer_display.config(text=self.timer)
         self.evaluate_start_button_state()
 
     def on_resize(self, event):
+        """Handle the resize event for the application."""
         self.resize_display()
 
     def resize_display(self):
+        """Handle the resizing of the timer display."""
         window_width = self.master.winfo_width()
         font_size = int((window_width * 0.9) / len(self.timer))
         self.timer_display.config(font=("Arial", font_size))
 
     def evaluate_start_button_state(self):
+        """This method will evaluate the state of the start button."""
         if (
             self.hours.get() == ""
             and self.minutes.get() == ""
@@ -277,6 +299,7 @@ class CountdownApp:
             self.start_button.config(state="enabled")
 
     def update_timer_frame_position(self):
+        """Update the position of the timer frame when the window is resized."""
         self.timer_frame.place(relx=0.5, rely=0.5, anchor="center")
 
 
