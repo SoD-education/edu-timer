@@ -209,7 +209,7 @@ class CountdownApp:
     def pause_timer(self):
         if not self.paused:
             self.paused = True
-            self.pause_button.config(text="CONTINUE")
+            self.pause_button.config(text="RESUME")
         else:
             self.paused = False
             self.pause_button.config(text="PAUSE")
