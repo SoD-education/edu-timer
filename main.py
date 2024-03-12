@@ -136,7 +136,9 @@ class CountdownApp:
         self.evaluate_start_button_state()
 
     def start_timer(self):
-        if not self.running and (
+        if self.start_button.cget("text") == "RESET" or self.timer == "Time's up!":
+            self.reset_timer()
+        elif not self.running and (
             self.hours.get() or self.minutes.get() or self.seconds.get()
         ):
             self.running = True
