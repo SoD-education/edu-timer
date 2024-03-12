@@ -3,10 +3,6 @@ from tkinter import ttk
 import ttkbootstrap as ttkb
 
 
-def load_app_config():
-    return "superhero", False
-
-
 class CountdownApp:
     def __init__(self, master):
         self.master = master
